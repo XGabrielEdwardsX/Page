@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <!-- Metadatos -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Edwards</title>
+
+     <!-- Favicon -->
+     <link rel="icon" type="image/png" sizes="48x48" href="https://previews.dropbox.com/p/thumb/ACa70zPrKgdI203oQPbJ-KqdyRVkZrj3xzieWs1OeYeL2rGX-XBuradFnNI8nNyfw31ELmjCUFgBoLrQMKmXrirRmNWXP-7Iv_pohBSNuNTNRvKLuRIEMKKmenj7CbhC3ap9tKa-Khl6WHjeIsLFKtU7SR_8T0bJ5LURQ-_VT8EtF4WiU7l5Tq1UHcXqimiBLPs3U8u_5R4DaLomyay7OCOJwfrm7UwwnbuTbT8gNC5hEtgaPbgCCcohCG227Gsp09JMwMGiT5R6U_T2_ClToh5ho3WM5VEZ1rOCzex0ct73bVdORvSsCdj0zY5HZecgLPM/p.png">
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Fuente personalizada -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Gabriel Edwards</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#hero">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sobre-mi.html">Sobre mí</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Lo que hablo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="apoyame.html">Apóyame</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="recursos.html">Recursos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="d-flex align-items-center">
+        <div class="container text-center position-relative">
+            <img src="https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/42bc8efbea4ad24f9d134d4de0ea974d~c5_1080x1080.jpeg?lk3s=a5d48078&nonce=2503&refresh_token=4bdb67d4c2acbce986abf7ab7631f091&x-expires=1728576000&x-signature=FQFPCYIw8tTgdh%2BTGFdYMkzLi%2Bs%3D&shp=a5d48078&shcp=81f88b70"
+                class="hero-image mb-4">
+            <p class="lead">Gabriel Edwards - 21 años</p>
+            <h1 class="display-3">La vida es filosofía y Fitness</h1>
+            <p class="lead">YO NO VENDO CURSOS</p>
+            <a href="#services" class="btn btn-gold btn-lg mt-3">Descubre más</a>
+        </div>
+    </section>
+
+    <!-- Redes Sociales -->
+    <section class="social-section py-5">
+        <div class="container text-center">
+            <h2 class="mb-5">Sígueme en mis redes sociales</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-2 mb-4">
+                    <a href="https://www.tiktok.com/@_gabrieledwards_" target="_blank" class="social-icon tiktok">
+                        <i class="fab fa-tiktok"></i>
+                        <p>TikTok</p>
+                    </a>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <a href="https://www.instagram.com/gabrieledwards_" target="_blank" class="social-icon instagram">
+                        <i class="fab fa-instagram"></i>
+                        <p>Instagram</p>
+                    </a>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <a href="https://www.youtube.com/@_gabrieledwards_" target="_blank" class="social-icon youtube">
+                        <i class="fab fa-youtube"></i>
+                        <p>YouTube</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Últimos Videos de YouTube -->
+    <section id="youtube-videos" class="youtube-videos-section py-5 bg-dark text-light">
+        <div class="container text-center">
+            <h2 class="mb-5">Últimos Videos</h2>
+            <div class="row" id="youtube-container">
+                <!-- Videos se cargarán aquí -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="services" class="services-section py-5">
+        <div class="container text-center">
+            <h2 class="mb-5">Cosas de las que hablo</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="service-box">
+                        <div class="service-image"
+                            style="background-image: url('https://dbe.rah.es/sites/default/files/styles/wide/public/imagenes/biografias/A-Marco-aurelio.jpg');">
+                        </div>
+                        <div class="service-content">
+                            <i class="fas fa-brain"></i>
+                            <h3>Filosofía</h3>
+                            <p>La vida es filosofía y la filosofía es vida.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="service-box">
+                        <div class="service-image"
+                            style="background-image: url('https://images.squarespace-cdn.com/content/v1/569ecea9b20943c520056ca5/140ba162-4d10-48de-82b0-9490b7d6d2e4/david+goggins.jpeg');">
+                        </div>
+                        <div class="service-content">
+                            <i class="fas fa-user-graduate"></i>
+                            <h3>Desarrollo Personal</h3>
+                            <p>Te enseño a dejar de ser un idiota cuando sea necesario.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="service-box">
+                        <div class="service-image"
+                            style="background-image: url('https://i.ytimg.com/vi/lYPhUpSvA1I/hq720.jpg');">
+                        </div>
+                        <div class="service-content">
+                            <i class="fas fa-dumbbell"></i>
+                            <h3>Fitness</h3>
+                            <p>Te gusta el ejercicio y eres un caballo? Entonces quédate.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contacto -->
+    <section id="contact" class="contact-section py-5 bg-dark text-light">
+        <div class="container text-center">
+            <h2 class="mb-5">Contáctame</h2>
+            <a href="contacto.html" class="btn btn-gold btn-lg">Preguntame lo que quieras</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-4 bg-dark text-light">
+        <div class="container text-center">
+            <p>&copy; 2024 Gabriel Edwards. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript para obtener los últimos videos de YouTube -->
+    <script>
+        // Clave API de YouTube
+        const API_KEY = 'AIzaSyDBHq7R-6cr-2Q537URdPnZB2pksvIsPVQ';
+
+        // ID del canal de YouTube
+        const CHANNEL_ID = 'UCVR_vHO_v8w75K0jMIt6leA';
+
+        // URL de la API para obtener los últimos videos del canal
+        const API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=3&type=video`;
+
+        // Función para obtener los videos de YouTube
+        async function obtenerUltimosVideos() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                mostrarVideos(data.items);
+            } catch (error) {
+                console.error('Error al obtener los videos de YouTube:', error);
+            }
+        }
+
+        // Función para mostrar los videos en la página
+        function mostrarVideos(videos) {
+            const youtubeContainer = document.getElementById('youtube-container');
+            youtubeContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevos videos
+
+            videos.forEach(video => {
+                const videoId = video.id.videoId;
+                let videoTitle = video.snippet.title;
+
+                // Quitar los hashtags del título
+                videoTitle = videoTitle.replace(/#[^\s]+/g, '');
+
+                // Crear el elemento HTML para el iframe del video
+                const videoElement = `
+                    <div class="col-md-4 mb-4">
+                        <div class="youtube-video">
+                            <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                            <h3>${videoTitle.trim()}</h3>
+                        </div>
+                    </div>
+                `;
+
+                // Agregar el video al contenedor
+                youtubeContainer.innerHTML += videoElement;
+            });
+        }
+
+        // Ejecutar la función para obtener y mostrar los videos
+        obtenerUltimosVideos();
+    </script>
+
+</body>
+
+</html>

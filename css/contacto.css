@@ -1,0 +1,106 @@
+body {
+    font-family: 'Bebas Neue', sans-serif;
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.btn-gold {
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-gold:hover {
+    background-color: #e6c200;
+    color: #000;
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    color: #FFD700 !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-left: 20px;
+    transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #FFD700;
+}
+
+/* Sección de Contacto */
+.contact-section {
+    background-color: #111;
+}
+
+.contact-section h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 30px;
+    padding-top: 50px;
+}
+
+.contact-section form {
+    background-color: #222;
+    padding: 30px;
+    border-radius: 10px;
+    
+}
+
+.contact-section .form-label {
+    color: #FFD700;
+    font-size: 1.2rem;
+}
+
+.contact-section .form-control {
+    background-color: #333;
+    border: none;
+    color: #fff;
+    font-family: "Roboto", sans-serif
+}
+
+.contact-section .form-control:focus {
+    background-color: #333;
+    color: #fff;
+    box-shadow: none;
+    border: 1px solid #FFD700;
+}
+
+.contact-section .btn {
+    font-size: 1.2rem;
+    margin-top: 20px;
+}
+
+/* Footer */
+.footer {
+    background-color: #000;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 1rem;
+    color: #777;
+}
+
+/* Responsivo */
+@media (max-width: 767px) {
+    .contact-section {
+        text-align: center;
+    }
+}
+

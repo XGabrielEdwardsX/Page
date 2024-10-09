@@ -1,0 +1,260 @@
+/* Fuente y colores */
+body {
+    font-family: 'Bebas Neue', sans-serif;
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+.text-gold {
+    color: #FFD700 !important;
+}
+
+.btn-gold {
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-gold:hover {
+    background-color: #e6c200;
+    color: #000;
+}
+
+.btn-outline-gold {
+    color: #FFD700;
+    border: 2px solid #FFD700;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-gold:hover {
+    background-color: #FFD700;
+    color: #000;
+}
+
+/* Navbar */
+.navbar {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    color: #FFD700 !important;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-left: 20px;
+    transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #FFD700;
+}
+
+/* Hero Section */
+#hero {
+    background-color: #000; /* Cambiamos el fondo a negro */
+    padding-top: 120px; /* Añadimos padding superior para separar del navbar */
+    padding-bottom: 60px; /* Añadimos padding inferior */
+    color: #fff;
+    position: relative;
+    text-align: center;
+}
+
+#hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-image {
+    max-width: 200px; /* Ajusta el tamaño según tus preferencias */
+    height: auto;
+    border-radius: 50%; /* Para hacer la imagen circular */
+    margin-bottom: 20px;
+    border: 5px solid #FFD700; /* Borde dorado */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#hero h1 {
+    font-size: 4rem;
+    color: #FFD700;
+    margin-bottom: 20px;
+}
+
+#hero p {
+    font-size: 1.5rem;
+}
+
+#hero .btn {
+    font-size: 1.2rem;
+}
+
+/* Redes Sociales */
+.social-section {
+    background-color: #111;
+}
+
+.social-section h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 50px;
+}
+
+.social-icon {
+    color: #fff;
+    font-size: 2rem;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.social-icon i {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.social-icon:hover {
+    color: #FFD700;
+    transform: translateY(-10px);
+}
+
+.tiktok {
+    color: #69C9D0;
+}
+
+.instagram {
+    color: #E1306C;
+}
+
+.youtube {
+    color: #FF0000;
+}
+
+/* YouTube Videos */
+.youtube-videos-section h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 50px;
+}
+
+.youtube-video h3 {
+    font-size: 1.2rem;
+    color: #FFD700;
+    margin-top: 15px;
+}
+
+/* Servicios */
+.services-section {
+    background-color: #000;
+}
+
+.services-section h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 50px;
+}
+
+.service-box {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.service-box:hover {
+    transform: translateY(-10px);
+}
+
+.service-image {
+    width: 100%;
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+}
+
+.service-content {
+    background-color: #111;
+    padding: 20px;
+    text-align: center;
+}
+
+.service-content i {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 15px;
+}
+
+.service-content h3 {
+    font-size: 1.8rem;
+    color: #FFD700;
+    margin-bottom: 10px;
+}
+
+.service-content p {
+    font-size: 1.1rem;
+    color: #ddd;
+}
+
+/* Contacto */
+.contact-section {
+    background-color: #111;
+}
+
+.contact-section h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 30px;
+}
+
+.contact-section .btn {
+    font-size: 1.2rem;
+}
+
+/* Footer */
+.footer {
+    background-color: #000;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 1rem;
+    color: #777;
+}
+
+/* Responsivo */
+@media (max-width: 767px) {
+    #hero {
+        padding-top: 100px;
+        padding-bottom: 40px;
+    }
+
+    #hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        margin-left: 0;
+    }
+
+    .social-icon i {
+        font-size: 3rem;
+    }
+
+    .service-content h3 {
+        font-size: 1.5rem;
+    }
+
+    .service-content p {
+        font-size: 1rem;
+    }
+}
