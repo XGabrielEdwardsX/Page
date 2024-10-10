@@ -101,8 +101,9 @@ a {
 }
 
 .profile-image {
-    width: 300px;
-    height: 300px;
+    width: 100%;  /* Permite que la imagen ocupe el 100% del ancho del contenedor */
+    max-width: 300px;  /* Limita el tamaño máximo */
+    height: auto;  /* Ajusta la altura automáticamente */
     object-fit: cover;
     border: 5px solid #FFD700;
 }
