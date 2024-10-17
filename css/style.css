@@ -259,33 +259,129 @@ a {
     }
 }
 
-/* Comentarios
+/* Estilos para la caja de comentarios */
+.comment-section {
+    background-color: #1a1a1a; /* Fondo oscuro */
+    padding: 20px;
+    border: 2px solid #FFD700; /* Borde dorado */
+    border-radius: 10px; /* Bordes redondeados */
+    margin-top: 20px;
+    color: #fff;
+}
 
-/* Cambiar el color de fondo de los comentarios */
-.hyvor-talk-comment {
+.reactions-section {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.reaction-btn {
+    background-color: transparent;
+    color: #FFD700; /* Color dorado */
+    font-size: 1.2rem;
+    border: none;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.reaction-btn:hover {
+    transform: scale(1.2);
+    color: #e6b800; /* Color dorado más oscuro al hacer hover */
+}
+
+
+/* Caja de texto de comentarios */
+textarea.comment-box {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: #000;
+    color: #fff;
+    border: 2px solid #FFD700;
+    border-radius: 5px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    margin: 10px auto;
+    resize: none;
+}
+
+/* Botón de enviar comentario */
+/* Botón de enviar comentario */
+.comment-btn {
+    display: block;
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px auto;
+    width: fit-content;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.comment-btn:hover {
+    background-color: #e6b800;
+    color: #fff;
+}
+
+/* Estilo para los comentarios */
+.comment {
+    margin-bottom: 20px;
+    padding: 15px;
     background-color: #1a1a1a;
+    border: 1px solid #FFD700;
+    border-radius: 10px;
     color: #f0f0f0;
 }
 
-/* Cambiar el color de los enlaces en los comentarios */
-.hyvor-talk-comment a {
+.comment-author {
+    font-size: 1.5rem;
     color: #FFD700;
 }
 
-/* Personalizar la fuente de los comentarios */
-.hyvor-talk-comment {
-    font-family: 'Bebas Neue', sans-serif;
+.comment-text {
+    font-size: 1.2rem;
 }
 
-/* Cambiar el estilo de los botones */
-.hyvor-talk-button {
-    background-color: #FFD700;
-    color: #1a1a1a;
-    border-radius: 5px;
+/* Links dentro de los comentarios */
+.comment a {
+    color: #FFD700;
+    text-decoration: none;
 }
 
-/* Hover effects para los botones */
-.hyvor-talk-button:hover {
-    background-color: #e6b800;
-    color: #ffffff;
+.comment a:hover {
+    text-decoration: underline;
+    color: #e6b800;
+}
+
+/* Responsivo para la caja de comentarios */
+@media (max-width: 767px) {
+    .comment-section {
+        padding: 10px;
+    }
+
+    .reaction-btn {
+        font-size: 1rem;
+    }
+
+    textarea.comment-box {
+        font-size: 1rem;
+        padding: 10px;
+    }
+
+    .comment-btn {
+        font-size: 1rem;
+        padding: 8px 15px;
+    }
+
+    .comment-author {
+        font-size: 1.2rem;
+    }
+
+    .comment-text {
+        font-size: 1rem;
+    }
 }

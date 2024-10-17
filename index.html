@@ -31,6 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/google.css">
 </head>
 
 <body>
@@ -160,6 +161,33 @@
         </div>
     </section>
 
+    <div class="comment-section">
+        <div class="reactions-section">
+            <!-- Botones de reacción -->
+            <button class="reaction-btn" id="caballo" onclick="handleReaction('caballo')">🐴 Caballo <span
+                    id="caballo-count">0</span></button>
+            <button class="reaction-btn" id="libertad" onclick="handleReaction('libertad')">🔥 Libertad <span
+                    id="libertad-count">0</span></button>
+            <button class="reaction-btn" id="filosofico" onclick="handleReaction('filosofico')">🗿 Filosófico <span
+                    id="filosofico-count">0</span></button>
+            <button class="reaction-btn" id="fitness" onclick="handleReaction('fitness')">🏋️‍♂️ Fitness <span
+                    id="fitness-count">0</span></button>
+        </div>
+    </div>
+    <!-- Botón de inicio de sesión de Google -->
+    <div id="g_id_onload" data-client_id="485728597604-07pj3cr1tnt766chb0tro4aj2kplacka.apps.googleusercontent.com"
+        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
+    </div>
+
+    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large">
+    </div>
+
+    <!-- Caja de texto para nuevo comentario -->
+    <textarea class="comment-box" placeholder="Escribe tu comentario..."></textarea>
+
+    <!-- Botón de enviar comentario -->
+    <button class="comment-btn">Comentar</button>
+
     <!-- Contacto -->
     <section id="contact" class="contact-section py-5 bg-dark text-light">
         <div class="container text-center">
@@ -241,6 +269,89 @@
         };
     </script>
     <script async type="text/javascript" src="https://talk.hyvor.com/web-api/embed"></script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        function handleCredentialResponse(response) {
+            const data = jwt_decode(response.credential);  // Decodificar el token JWT
+            console.log(data); // Verificar qué datos recibes
+
+            // Muestra los datos en la interfaz o realiza alguna acción
+            document.querySelector('.comment-section').innerHTML = `
+                <div>
+                  <h3>Bienvenido, ${data.name}</h3>
+                  <img src="${data.picture}" alt="${data.name}" style="border-radius: 50%; width: 50px;">
+                </div>`;
+        }
+
+        // Función para decodificar el JWT (puedes incluir esta librería externa)
+        function jwt_decode(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+    </script>
+
+    <script>
+        // Estado de las reacciones del usuario
+        let userReactions = {
+            caballo: false,
+            libertad: false,
+            filosofico: false,
+            fitness: false
+        };
+
+        function handleReaction(type) {
+            const countElement = document.getElementById(type + '-count');
+            let currentCount = parseInt(countElement.innerText);
+
+            // Verificar si el usuario ya ha reaccionado
+            if (userReactions[type]) {
+                // Si ya reaccionó, quitamos la reacción
+                currentCount -= 1;
+                countElement.innerText = currentCount;
+                userReactions[type] = false; // Marcar que ya no ha reaccionado
+
+                // Enviar la solicitud para eliminar la reacción
+                sendReactionToServer(type, currentCount, 'remove');
+            } else {
+                // Si no ha reaccionado, agregamos la reacción
+                currentCount += 1;
+                countElement.innerText = currentCount;
+                userReactions[type] = true; // Marcar que ha reaccionado
+
+                // Enviar la solicitud para agregar la reacción
+                sendReactionToServer(type, currentCount, 'add');
+            }
+        }
+
+        function sendReactionToServer(type, count, action) {
+            // Aquí podrías enviar la información a Hyvor Talk o a tu servidor
+            fetch('/path-to-your-server-or-hyvor-api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    reaction: type,
+                    count: count,
+                    action: action // Especifica si es agregar ('add') o eliminar ('remove')
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Reacción procesada con éxito:', data);
+                })
+                .catch((error) => {
+                    console.error('Error al procesar la reacción:', error);
+                });
+        }
+    </script>
 
 </body>
 

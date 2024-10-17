@@ -1,0 +1,6 @@
+.g_id_signin {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    margin: 20px auto; /* Ajusta el margen superior e inferior */
+    width: fit-content; /* Ajusta el ancho al contenido del botón */
+}
