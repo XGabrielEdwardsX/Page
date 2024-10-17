@@ -21,6 +21,7 @@
 .reacciones-section .reaccion-button.active {
     background-color: #FFD700; /* Color dorado para cuando se selecciona */
     color: #ffffff; /* Texto en negro cuando se selecciona */
+    transform: scale(1.1); /* Efecto de aumento al estar activo */
 }
 
 .reacciones-section .reaccion-button:hover {
@@ -41,4 +42,11 @@
 
 #reacciones-usuarios img {
     border: 2px solid #FFD700;
+}
+
+#caballo-count,
+#libertad-count,
+#filosofico-count,
+#fitness-count {
+    transition: color 0.3s;
 }

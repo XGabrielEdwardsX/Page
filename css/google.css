@@ -12,6 +12,7 @@
 .google-signin-container {
     margin-top: 20px;
     display: flex;
+    flex-direction: column; /* Alinear verticalmente */
     justify-content: center;
     align-items: center;
 }
@@ -28,6 +29,7 @@
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
     width: fit-content;
+    margin-bottom: 15px; /* Espacio debajo del botón */
 }
 
 #google-signin:hover {
@@ -35,6 +37,7 @@
     color: #000;
 }
 
+/* Estilos para el botón de Cerrar Sesión */
 #signout {
     background-color: #FFD700; /* Fondo dorado */
     color: #000; /* Texto negro */
@@ -44,7 +47,8 @@
     font-size: 1.2rem;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 10px;
+    display: none; /* Inicialmente oculto */
+    width: fit-content;
 }
 
 #signout:hover {
@@ -57,10 +61,21 @@
     margin-top: 15px;
     text-align: center;
     color: #FFD700; /* Texto dorado */
+    display: flex;
+    flex-direction: column; /* Alinear elementos verticalmente */
+    align-items: center;
 }
 
+/* Foto de perfil del usuario */
 #user-photo {
-    margin-right: 10px;
-    border: 2px solid #FFD700;
+    margin-bottom: 10px; /* Espacio debajo de la foto */
+    border: 1px solid #0e0e0e;
     border-radius: 50%;
+}
+
+/* Nombre del usuario */
+#user-name {
+    margin-bottom: 10px; /* Espacio debajo del nombre */
+    font-size: 1.2rem;
+    font-weight: bold;
 }
