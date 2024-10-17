@@ -161,6 +161,7 @@
         </div>
     </section>
 
+    <!-- Sección de comentarios -->
     <div class="comment-section">
         <div class="reactions-section">
             <!-- Botones de reacción -->
@@ -174,6 +175,7 @@
                     id="fitness-count">0</span></button>
         </div>
     </div>
+
     <!-- Botón de inicio de sesión de Google -->
     <div id="g_id_onload" data-client_id="485728597604-07pj3cr1tnt766chb0tro4aj2kplacka.apps.googleusercontent.com"
         data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
@@ -192,7 +194,7 @@
     <section id="contact" class="contact-section py-5 bg-dark text-light">
         <div class="container text-center">
             <h2 class="mb-5">Contáctame</h2>
-            <a href="contacto.html" class="btn btn-gold btn-lg">Preguntame lo que quieras</a>
+            <a href="contacto.html" class="btn btn-gold btn-lg">Pregúntame lo que quieras</a>
         </div>
     </section>
 
@@ -205,18 +207,14 @@
 
     <!-- Bootstrap JS y dependencias -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- JavaScript para obtener los últimos videos de YouTube -->
     <script>
-        // Clave API de YouTube
         const API_KEY = 'AIzaSyDBHq7R-6cr-2Q537URdPnZB2pksvIsPVQ';
-
-        // ID del canal de YouTube
         const CHANNEL_ID = 'UCVR_vHO_v8w75K0jMIt6leA';
 
-        // URL de la API para obtener los últimos videos del canal
         const API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=3&type=video`;
 
-        // Función para obtener los videos de YouTube
         async function obtenerUltimosVideos() {
             try {
                 const response = await fetch(API_URL);
@@ -227,19 +225,15 @@
             }
         }
 
-        // Función para mostrar los videos en la página
         function mostrarVideos(videos) {
             const youtubeContainer = document.getElementById('youtube-container');
-            youtubeContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar nuevos videos
+            youtubeContainer.innerHTML = '';
 
             videos.forEach(video => {
                 const videoId = video.id.videoId;
                 let videoTitle = video.snippet.title;
-
-                // Quitar los hashtags del título
                 videoTitle = videoTitle.replace(/#[^\s]+/g, '');
 
-                // Crear el elemento HTML para el iframe del video
                 const videoElement = `
                     <div class="col-md-4 mb-4">
                         <div class="youtube-video">
@@ -251,41 +245,31 @@
                     </div>
                 `;
 
-                // Agregar el video al contenedor
                 youtubeContainer.innerHTML += videoElement;
             });
         }
 
-        // Ejecutar la función para obtener y mostrar los videos
         obtenerUltimosVideos();
     </script>
 
-    <!-- Hyvor Talk Comment Box -->
-    <div id="hyvor-talk-view"></div>
-    <script type="text/javascript">
-        var HYVOR_TALK_WEBSITE = '12042'; // Reemplaza con tu ID de sitio
-        var HYVOR_TALK_CONFIG = {
-            // Opciones de configuración adicionales (opcional)
-        };
-    </script>
-    <script async type="text/javascript" src="https://talk.hyvor.com/web-api/embed"></script>
-
+    <!-- Inicio de sesión de Google -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <script>
         function handleCredentialResponse(response) {
-            const data = jwt_decode(response.credential);  // Decodificar el token JWT
-            console.log(data); // Verificar qué datos recibes
+            const data = jwt_decode(response.credential);
+            let welcomeContainer = document.querySelector('.welcome-message');
+            if (!welcomeContainer) {
+                welcomeContainer = document.createElement('div');
+                welcomeContainer.classList.add('welcome-message');
+                document.querySelector('.comment-section').prepend(welcomeContainer);
+            }
 
-            // Muestra los datos en la interfaz o realiza alguna acción
-            document.querySelector('.comment-section').innerHTML = `
-                <div>
-                  <h3>Bienvenido, ${data.name}</h3>
-                  <img src="${data.picture}" alt="${data.name}" style="border-radius: 50%; width: 50px;">
-                </div>`;
+            welcomeContainer.innerHTML = `
+                <h3>Bienvenido, ${data.name}</h3>
+                <img src="${data.picture}" alt="${data.name}" style="border-radius: 50%; width: 50px;">
+            `;
         }
 
-        // Función para decodificar el JWT (puedes incluir esta librería externa)
         function jwt_decode(token) {
             var base64Url = token.split('.')[1];
             var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -297,8 +281,8 @@
         }
     </script>
 
+    <!-- Manejo de reacciones -->
     <script>
-        // Estado de las reacciones del usuario
         let userReactions = {
             caballo: false,
             libertad: false,
@@ -310,37 +294,27 @@
             const countElement = document.getElementById(type + '-count');
             let currentCount = parseInt(countElement.innerText);
 
-            // Verificar si el usuario ya ha reaccionado
             if (userReactions[type]) {
-                // Si ya reaccionó, quitamos la reacción
                 currentCount -= 1;
-                countElement.innerText = currentCount;
-                userReactions[type] = false; // Marcar que ya no ha reaccionado
-
-                // Enviar la solicitud para eliminar la reacción
-                sendReactionToServer(type, currentCount, 'remove');
+                userReactions[type] = false;
             } else {
-                // Si no ha reaccionado, agregamos la reacción
                 currentCount += 1;
-                countElement.innerText = currentCount;
-                userReactions[type] = true; // Marcar que ha reaccionado
-
-                // Enviar la solicitud para agregar la reacción
-                sendReactionToServer(type, currentCount, 'add');
+                userReactions[type] = true;
             }
+
+            countElement.innerText = currentCount;
+            sendReactionToServer(type, currentCount, userReactions[type] ? 'add' : 'remove');
         }
 
         function sendReactionToServer(type, count, action) {
-            // Aquí podrías enviar la información a Hyvor Talk o a tu servidor
-            fetch('/path-to-your-server-or-hyvor-api', {
+            fetch('/.netlify/functions/reactions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     reaction: type,
-                    count: count,
-                    action: action // Especifica si es agregar ('add') o eliminar ('remove')
+                    action: action
                 }),
             })
                 .then(response => response.json())
