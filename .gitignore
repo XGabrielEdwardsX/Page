@@ -1,0 +1,10 @@
+# Ignorar node_modules (carpeta con dependencias)
+node_modules/
+
+# Ignorar archivos de entorno sensibles
+.env
+
+# Ignorar otros archivos temporales o innecesarios
+.DS_Store
+.idea/
+.vscode/
