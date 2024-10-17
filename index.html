@@ -8,6 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gabriel Edwards</title>
 
+    <!-- Firebase App (la versión base es necesaria) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="imagenes/favicon-48x48.png">
 
@@ -32,6 +39,7 @@
     <!-- Estilos personalizados -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/google.css">
+    <link rel="stylesheet" href="css/reacciones.css">
 </head>
 
 <body>
@@ -161,28 +169,37 @@
         </div>
     </section>
 
-    <!-- Sección de comentarios -->
-    <div class="comment-section">
-        <div class="reactions-section">
-            <!-- Botones de reacción -->
-            <button class="reaction-btn" id="caballo" onclick="handleReaction('caballo')">🐴 Caballo <span
-                    id="caballo-count">0</span></button>
-            <button class="reaction-btn" id="libertad" onclick="handleReaction('libertad')">🔥 Libertad <span
-                    id="libertad-count">0</span></button>
-            <button class="reaction-btn" id="filosofico" onclick="handleReaction('filosofico')">🗿 Filosófico <span
-                    id="filosofico-count">0</span></button>
-            <button class="reaction-btn" id="fitness" onclick="handleReaction('fitness')">🏋️‍♂️ Fitness <span
-                    id="fitness-count">0</span></button>
+    <!-- Sección de Reacciones -->
+    <section id="reacciones" class="reacciones-section py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">Reacciones</h2>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-primary me-2 reaccion-button" data-reaction="caballo">
+                    🐴 Caballo <span id="caballo-count">0</span>
+                </button>
+                <button class="btn btn-outline-success me-2 reaccion-button" data-reaction="libertad">
+                    🔥 Libertad <span id="libertad-count">0</span>
+                </button>
+                <button class="btn btn-outline-warning me-2 reaccion-button" data-reaction="filosofico">
+                    🗿 Filosófico <span id="filosofico-count">0</span>
+                </button>
+                <button class="btn btn-outline-danger me-2 reaccion-button" data-reaction="fitness">
+                    🏋️‍♂️ Fitness <span id="fitness-count">0</span>
+                </button>
+            </div>
+
+            <div class="google-signin-container mt-4">
+                <button id="google-signin" class="btn btn-primary">
+                    <i class="fab fa-google"></i> Iniciar Sesión para comentar y reaccionar
+                </button>
+
+            <!-- Información del usuario -->
+            <div id="user-info" style="display: none;">
+                <img id="user-photo" src="" alt="Foto de Perfil" width="50" height="50" class="rounded-circle">
+                <span id="user-name"></span>
+            </div>
         </div>
-    </div>
-
-    <!-- Botón de inicio de sesión de Google -->
-    <div id="g_id_onload" data-client_id="485728597604-07pj3cr1tnt766chb0tro4aj2kplacka.apps.googleusercontent.com"
-        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
-    </div>
-
-    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-size="large">
-    </div>
+    </section>
 
     <!-- Caja de texto para nuevo comentario -->
     <textarea class="comment-box" placeholder="Escribe tu comentario..."></textarea>
@@ -252,36 +269,82 @@
         obtenerUltimosVideos();
     </script>
 
-    <!-- Inicio de sesión de Google -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Script para Manejar Autenticación con Firebase -->
     <script>
-        function handleCredentialResponse(response) {
-            const data = jwt_decode(response.credential);
-            let welcomeContainer = document.querySelector('.welcome-message');
-            if (!welcomeContainer) {
-                welcomeContainer = document.createElement('div');
-                welcomeContainer.classList.add('welcome-message');
-                document.querySelector('.comment-section').prepend(welcomeContainer);
-            }
-
-            welcomeContainer.innerHTML = `
-                <h3>Bienvenido, ${data.name}</h3>
-                <img src="${data.picture}" alt="${data.name}" style="border-radius: 50%; width: 50px;">
-            `;
-        }
-
-        function jwt_decode(token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-
-            return JSON.parse(jsonPayload);
-        }
+        // Tu configuración de Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyCI6qEjysMXJ5SLjvDk3KtVLORIZ1V8FAA",
+            authDomain: "gabriel-edwards.firebaseapp.com",
+            projectId: "gabriel-edwards",
+            storageBucket: "gabriel-edwards.appspot.com",
+            messagingSenderId: "176739261816",
+            appId: "1:176739261816:web:00ba8da3488ed721f8bc8d",
+            measurementId: "G-WH2TYNC56J"
+        };
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        var auth = firebase.auth();
+        var db = firebase.firestore();
     </script>
 
-    <!-- Manejo de reacciones -->
+    <script>
+        // Referencias a los elementos de la interfaz
+        const googleSignInButton = document.getElementById('google-signin');
+        const signOutButton = document.getElementById('signout');
+        const userInfo = document.getElementById('user-info');
+        const userPhoto = document.getElementById('user-photo');
+        const userName = document.getElementById('user-name');
+
+        // Función para iniciar sesión con Google
+        googleSignInButton.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    console.log('Usuario iniciado:', result.user);
+                })
+                .catch((error) => {
+                    console.error('Error al iniciar sesión:', error);
+                    alert('Error al iniciar sesión. Por favor, intenta de nuevo.');
+                });
+        });
+
+        // Función para cerrar sesión
+        signOutButton.addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    console.log('Usuario cerrado sesión');
+                })
+                .catch((error) => {
+                    console.error('Error al cerrar sesión:', error);
+                    alert('Error al cerrar sesión. Por favor, intenta de nuevo.');
+                });
+        });
+
+        // Escuchar cambios en el estado de autenticación
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Mostrar botón de cerrar sesión y ocultar botón de inicio
+                googleSignInButton.style.display = 'none';
+                signOutButton.style.display = 'inline-block';
+
+                // Mostrar información del usuario
+                userInfo.style.display = 'block';
+                userPhoto.src = user.photoURL;
+                userName.textContent = `Bienvenido, ${user.displayName}`;
+            } else {
+                // Mostrar botón de inicio y ocultar botón de cerrar sesión
+                googleSignInButton.style.display = 'inline-block';
+                signOutButton.style.display = 'none';
+
+                // Ocultar información del usuario
+                userInfo.style.display = 'none';
+                userPhoto.src = '';
+                userName.textContent = '';
+            }
+        });
+    </script>
+
+    <!-- Manejo de Reacciones -->
     <script>
         let userReactions = {
             caballo: false,
@@ -307,7 +370,7 @@
         }
 
         function sendReactionToServer(type, count, action) {
-            fetch('/.netlify/functions/reactions', {
+            fetch('/.netlify/functions/manejarReaccion', { // Asegúrate de que esta función existe y está correctamente configurada
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -323,10 +386,196 @@
                 })
                 .catch((error) => {
                     console.error('Error al procesar la reacción:', error);
+                    alert('Hubo un error al procesar tu reacción. Por favor, intenta de nuevo.');
                 });
         }
     </script>
 
-</body>
+    <!-- Escuchar cambios en las Reacciones en Firestore -->
+    <script>
+        // Referencia al documento de reacciones
+        var reactionsRef = db.collection('reacciones').doc('current_reactions');
 
-</html>
+        // Escuchar cambios en tiempo real
+        reactionsRef.onSnapshot((doc) => {
+            if (doc.exists) {
+                var data = doc.data();
+                document.getElementById('caballo-count').innerText = data.caballo;
+                document.getElementById('libertad-count').innerText = data.libertad;
+                document.getElementById('filosofico-count').innerText = data.filosofico;
+                document.getElementById('fitness-count').innerText = data.fitness;
+            } else {
+                console.log("No se encontró el documento de reacciones.");
+            }
+        }, (error) => {
+            console.log("Error al obtener el documento de reacciones:", error);
+        });
+    </script>
+
+    <!-- Manejo de Comentarios -->
+    <script>
+        const comentarioTexto = document.getElementById('comentario-texto');
+        const enviarComentarioBtn = document.getElementById('enviar-comentario');
+        const comentariosContainer = document.getElementById('comentarios-container'); // Asegúrate de tener este contenedor
+
+        enviarComentarioBtn.addEventListener('click', async () => {
+            const texto = comentarioTexto.value.trim();
+
+            if (!texto) {
+                alert('Por favor, escribe un comentario.');
+                return;
+            }
+
+            // Obtener el usuario actual
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Debes iniciar sesión para comentar.');
+                return;
+            }
+
+            try {
+                const token = await user.getIdToken();
+
+                const response = await fetch('/.netlify/functions/crearComentario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ texto })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Comentario enviado exitosamente.');
+                    comentarioTexto.value = '';
+                    cargarComentarios(); // Función para recargar los comentarios
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error al enviar comentario:', error);
+                alert('Hubo un error al enviar tu comentario. Inténtalo de nuevo.');
+            }
+        });
+
+        // Función para cargar y mostrar los comentarios
+        async function cargarComentarios() {
+            try {
+                const snapshot = await db.collection('comentarios').orderBy('timestamp', 'desc').get();
+                comentariosContainer.innerHTML = ''; // Limpiar contenedor
+
+                snapshot.forEach(doc => {
+                    const comentario = doc.data();
+                    const comentarioElement = document.createElement('div');
+                    comentarioElement.classList.add('col-md-6', 'mb-4');
+                    comentarioElement.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            ${comentario.usuarioFoto ? `<img src="${comentario.usuarioFoto}" alt="${comentario.usuarioNombre}" class="rounded-circle me-2" width="40" height="40">` : ''}
+                            <h5 class="card-title mb-0">${comentario.usuarioNombre}</h5>
+                        </div>
+                        <p class="card-text">${comentario.texto}</p>
+                        <small class="text-muted">${comentario.timestamp?.toDate().toLocaleString() || ''}</small>
+                    </div>
+                </div>
+            `;
+                    comentariosContainer.appendChild(comentarioElement);
+                });
+            } catch (error) {
+                console.error('Error al cargar comentarios:', error);
+                comentariosContainer.innerHTML = '<p>Error al cargar comentarios.</p>';
+            }
+        }
+
+        // Cargar comentarios al cargar la página
+        window.onload = cargarComentarios;
+
+        // Actualizar comentarios en tiempo real
+        db.collection('comentarios').orderBy('timestamp', 'desc')
+            .onSnapshot(snapshot => {
+                cargarComentarios();
+            });
+    </script>
+
+    <!-- Manejo de Reacciones Vinculadas a Usuarios -->
+    <script>
+        const reaccionButtons = document.querySelectorAll('.reaccion-button');
+        const reaccionesUsuariosContainer = document.getElementById('reacciones-usuarios');
+
+        reaccionButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const reaction = button.getAttribute('data-reaction');
+                const action = button.classList.contains('active') ? 'remove' : 'add';
+
+                // Alternar la clase 'active' para visualización
+                button.classList.toggle('active');
+
+                // Obtener el usuario actual
+                const user = auth.currentUser;
+                if (!user) {
+                    alert('Debes iniciar sesión para reaccionar.');
+                    return;
+                }
+
+                try {
+                    const token = await user.getIdToken();
+
+                    const response = await fetch('/.netlify/functions/manejarReaccion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ reaction, action })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Actualizar los conteos de reacciones
+                        document.getElementById(`${reaction}-count`).innerText = data.reactions[reaction];
+                        cargarReaccionesUsuarios();
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error al enviar reacción:', error);
+                    alert('Hubo un error al enviar tu reacción. Inténtalo de nuevo.');
+                }
+            });
+        });
+
+        // Función para cargar y mostrar quién ha reaccionado
+        async function cargarReaccionesUsuarios() {
+            try {
+                const snapshot = await db.collection('reaccionesUsuarios').get();
+                reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
+
+                snapshot.forEach(doc => {
+                    const reaccionUsuario = doc.data();
+                    const reaccionElement = document.createElement('p');
+                    reaccionElement.innerHTML = `
+                <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+                <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
+            `;
+                    reaccionesUsuariosContainer.appendChild(reaccionElement);
+                });
+            } catch (error) {
+                console.error('Error al cargar reacciones de usuarios:', error);
+                reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
+            }
+        }
+
+        // Cargar reacciones de usuarios al cargar la página
+        window.onload = () => {
+            cargarReaccionesUsuarios();
+
+            // Escuchar cambios en tiempo real
+            db.collection('reaccionesUsuarios').onSnapshot(snapshot => {
+                cargarReaccionesUsuarios();
+            });
+        };
+    </script>

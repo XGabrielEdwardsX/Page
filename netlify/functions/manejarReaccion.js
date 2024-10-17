@@ -14,9 +14,38 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 exports.handler = async function (event, context) {
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ message: 'Método no permitido' }),
+        };
+    }
+
     try {
-        // Parsear la información de la solicitud
+        // Obtener el token de autorización del encabezado
+        const token = event.headers.authorization?.split('Bearer ')[1];
+        if (!token) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ message: 'No autorizado' }),
+            };
+        }
+
+        // Verificar el token
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        const usuarioId = decodedToken.uid;
+        const usuarioNombre = decodedToken.name;
+        const usuarioFoto = decodedToken.picture;
+
         const { reaction, action } = JSON.parse(event.body);
+
+        if (!reaction || !action) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Datos incompletos' }),
+            };
+        }
+
         const reactionsRef = db.collection('reacciones').doc('current_reactions');
 
         // Obtener las reacciones actuales del documento
@@ -44,6 +73,14 @@ exports.handler = async function (event, context) {
             await reactionsRef.set(reactions);
         }
 
+        // Registrar quién reaccionó
+        const reaccionUsuarioRef = db.collection('reaccionesUsuarios').doc(usuarioId);
+        await reaccionUsuarioRef.set({
+            reaction,
+            action,
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
         // Responder con éxito y el estado actualizado de las reacciones
         return {
             statusCode: 200,
@@ -54,7 +91,7 @@ exports.handler = async function (event, context) {
         console.error('Error al procesar la reacción:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Error al procesar la reacción', error })
+            body: JSON.stringify({ message: 'Error al procesar la reacción', error }),
         };
     }
 };

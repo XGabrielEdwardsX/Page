@@ -1,0 +1,44 @@
+/* Estilos para los botones de reacciones */
+.reacciones-section  {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: #000000; /* Cambiar a blanco para el texto */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 10px 20px;
+}
+
+.reaccion-button {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: #ffffff; /* Cambiar a blanco para el texto */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+}
+
+
+.reacciones-section .reaccion-button.active {
+    background-color: #FFD700; /* Color dorado para cuando se selecciona */
+    color: #ffffff; /* Texto en negro cuando se selecciona */
+}
+
+.reacciones-section .reaccion-button:hover {
+    background-color: #e6b800; /* Color dorado más oscuro al hacer hover */
+}
+
+/* Ajustes generales de la sección de reacciones */
+.reacciones-section h2 {
+    font-size: 2rem;
+    color: #FFD700;
+}
+
+/* Estilo para mostrar usuarios que reaccionaron */
+#reacciones-usuarios p {
+    color: #FFD700;
+    font-size: 1.2rem;
+}
+
+#reacciones-usuarios img {
+    border: 2px solid #FFD700;
+}
