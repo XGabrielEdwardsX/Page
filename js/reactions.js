@@ -110,6 +110,34 @@ export function setupReactions(auth, db) {
         }
     }
 
+    // Función para cargar las reacciones desde Firestore
+    async function cargarReacciones() {
+        const reactionsRef = db.collection('reacciones').doc('current_reactions');
+        
+        try {
+            const doc = await reactionsRef.get();
+            if (doc.exists) {
+                const reactions = doc.data();
+                
+                // Actualizar los contadores en la interfaz
+                document.getElementById('caballo-count').textContent = reactions.caballo || 0;
+                document.getElementById('libertad-count').textContent = reactions.libertad || 0;
+                document.getElementById('filosofico-count').textContent = reactions.filosofico || 0;
+                document.getElementById('fitness-count').textContent = reactions.fitness || 0;
+            } else {
+                console.log("No se encontró el documento de reacciones.");
+            }
+        } catch (error) {
+            console.error("Error al cargar las reacciones:", error);
+        }
+    }
+
+    // Llamar a la función cuando la página cargue
+    window.addEventListener('load', () => {
+        cargarReacciones();
+        window.loadUserReactions();
+    });
+
     // Manejo de Reacciones con Optimistic UI
     reaccionButtons.forEach(button => {
         button.addEventListener('click', async () => {
