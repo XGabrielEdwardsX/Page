@@ -188,6 +188,11 @@
                 </button>
             </div>
 
+            <!-- Contenedor para mostrar reacciones de usuarios -->
+            <div id="reacciones-usuarios" class="mt-4">
+                <!-- Aquí se mostrarán las personas que han reaccionado -->
+            </div>
+
             <div id="auth" class="google-signin-container mt-4">
                 <button id="google-signin" class="btn btn-primary">
                     <i class="fab fa-google"></i> Iniciar Sesión para Comentar y Reaccionar
@@ -288,9 +293,9 @@
         firebase.initializeApp(firebaseConfig);
         var auth = firebase.auth();
         var db = firebase.firestore();
-    </script>
 
-    <script>
+
+
         // Referencias a los elementos de la interfaz
         const googleSignInButton = document.getElementById('google-signin');
         const signOutButton = document.getElementById('signout');
@@ -324,7 +329,6 @@
         });
 
         // Escuchar cambios en el estado de autenticación
-        // Escuchar cambios en el estado de autenticación
         auth.onAuthStateChanged((user) => {
             const googleSignInButton = document.getElementById('google-signin');
             const signOutButton = document.getElementById('signout');
@@ -348,10 +352,10 @@
                 userInfo.style.display = 'none';
             }
         });
-    </script>
 
-    <!-- Manejo de Reacciones -->
-    <script>
+
+        <!-- Manejo de Reacciones -->
+
         let userReactions = {
             caballo: false,
             libertad: false,
@@ -556,19 +560,28 @@
 
         // Función para cargar y mostrar quién ha reaccionado
         async function cargarReaccionesUsuarios() {
+            if (!reaccionesUsuariosContainer) {
+                console.error('El contenedor de reacciones de usuarios no existe.');
+                return;
+            }
+
             try {
                 const snapshot = await db.collection('reaccionesUsuarios').get();
                 reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
 
-                snapshot.forEach(doc => {
-                    const reaccionUsuario = doc.data();
-                    const reaccionElement = document.createElement('p');
-                    reaccionElement.innerHTML = `
-                <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
-                <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
-            `;
-                    reaccionesUsuariosContainer.appendChild(reaccionElement);
-                });
+                if (snapshot.empty) {
+                    reaccionesUsuariosContainer.innerHTML = '<p>No hay reacciones de usuarios.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const reaccionUsuario = doc.data();
+                        const reaccionElement = document.createElement('p');
+                        reaccionElement.innerHTML = `
+                    <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+                    <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
+                `;
+                        reaccionesUsuariosContainer.appendChild(reaccionElement);
+                    });
+                }
             } catch (error) {
                 console.error('Error al cargar reacciones de usuarios:', error);
                 reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';

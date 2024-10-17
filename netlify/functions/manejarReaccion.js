@@ -76,6 +76,8 @@ exports.handler = async function (event, context) {
         // Registrar quién reaccionó
         const reaccionUsuarioRef = db.collection('reaccionesUsuarios').doc(usuarioId);
         await reaccionUsuarioRef.set({
+            usuarioNombre,
+            usuarioFoto,
             reaction,
             action,
             timestamp: admin.firestore.FieldValue.serverTimestamp()
