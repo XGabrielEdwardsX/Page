@@ -258,3 +258,34 @@ a {
         font-size: 1rem;
     }
 }
+
+/* Comentarios
+
+/* Cambiar el color de fondo de los comentarios */
+.hyvor-talk-comment {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+}
+
+/* Cambiar el color de los enlaces en los comentarios */
+.hyvor-talk-comment a {
+    color: #FFD700;
+}
+
+/* Personalizar la fuente de los comentarios */
+.hyvor-talk-comment {
+    font-family: 'Bebas Neue', sans-serif;
+}
+
+/* Cambiar el estilo de los botones */
+.hyvor-talk-button {
+    background-color: #FFD700;
+    color: #1a1a1a;
+    border-radius: 5px;
+}
+
+/* Hover effects para los botones */
+.hyvor-talk-button:hover {
+    background-color: #e6b800;
+    color: #ffffff;
+}
