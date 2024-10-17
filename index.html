@@ -210,10 +210,19 @@
     </section>
 
     <!-- Caja de texto para nuevo comentario -->
-    <textarea class="comment-box" placeholder="Escribe tu comentario..."></textarea>
+    <textarea id="comentario-texto" class="comment-box" placeholder="Escribe tu comentario..."></textarea>
 
     <!-- Botón de enviar comentario -->
-    <button class="comment-btn">Comentar</button>
+    <button id="enviar-comentario" class="comment-btn">Comentar</button>
+
+    <section id="mostrar-comentarios" class="mostrar-comentarios-section py-5 bg-dark text-light">
+        <div class="container">
+            <h2 class="mb-4 text-center">Comentarios</h2>
+            <div id="comentarios-container" class="row">
+                <!-- Los comentarios se insertarán aquí dinámicamente -->
+            </div>
+        </div>
+    </section>
 
     <!-- Contacto -->
     <section id="contact" class="contact-section py-5 bg-dark text-light">
@@ -229,9 +238,6 @@
             <p>&copy; 2024 Gabriel Edwards. Todos los derechos reservados.</p>
         </div>
     </footer>
-
-    <!-- Bootstrap JS y dependencias -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript para obtener los últimos videos de YouTube -->
     <script>
@@ -598,3 +604,9 @@
             });
         };
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+
+</html>
