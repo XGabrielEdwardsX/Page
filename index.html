@@ -79,7 +79,7 @@
     <!-- Hero Section -->
     <section id="hero" class="d-flex align-items-center">
         <div class="container text-center position-relative">
-            <img src="imagenes\Imagen principal.jpeg" class="hero-image mb-4">
+            <img src="imagenes/Imagen principal.jpeg" class="hero-image mb-4" alt="Imagen Principal">
             <p class="lead">Gabriel Edwards - 21 años</p>
             <h1 class="display-3">La vida es filosofía y Fitness</h1>
             <p class="lead">YO NO VENDO CURSOS</p>
@@ -188,11 +188,12 @@
                 </button>
             </div>
 
-            <!-- Contenedor para mostrar reacciones de usuarios -->
+            <!-- Contenedor para mostrar las últimas 2 reacciones de usuarios -->
             <div id="reacciones-usuarios" class="mt-4">
-                <!-- Aquí se mostrarán las personas que han reaccionado -->
+                <!-- Aquí se mostrarán las últimas dos personas que han reaccionado -->
             </div>
 
+            <!-- Contenedor de Autenticación -->
             <div id="auth" class="google-signin-container mt-4">
                 <button id="google-signin" class="btn btn-primary">
                     <i class="fab fa-google"></i> Iniciar Sesión para Comentar y Reaccionar
@@ -300,8 +301,6 @@
         var auth = firebase.auth();
         var db = firebase.firestore();
 
-
-
         // Referencias a los elementos de la interfaz
         const googleSignInButton = document.getElementById('google-signin');
         const signOutButton = document.getElementById('signout');
@@ -334,14 +333,8 @@
                 });
         });
 
-        // Escuchar cambios en el estado de autenticación
+        // Manejo del Estado de Autenticación
         auth.onAuthStateChanged((user) => {
-            const googleSignInButton = document.getElementById('google-signin');
-            const signOutButton = document.getElementById('signout');
-            const userInfo = document.getElementById('user-info');
-            const userPhoto = document.getElementById('user-photo');
-            const userName = document.getElementById('user-name');
-
             if (user) {
                 // Ocultar botón de inicio y mostrar botón de cerrar sesión e información del usuario
                 googleSignInButton.style.display = 'none';
@@ -351,17 +344,38 @@
                 // Mostrar la información del usuario
                 userPhoto.src = user.photoURL;
                 userName.textContent = `Bienvenido, ${user.displayName}`;
+
+                // Cargar las reacciones del usuario
+                cargarUserReactions();
             } else {
                 // Mostrar botón de inicio y ocultar botón de cerrar sesión e información del usuario
                 googleSignInButton.style.display = 'inline-block';
                 signOutButton.style.display = 'none';
                 userInfo.style.display = 'none';
+
+                // Resetear las reacciones del usuario
+                userReactions = {
+                    caballo: false,
+                    libertad: false,
+                    filosofico: false,
+                    fitness: false
+                };
+
+                // Actualizar el estado de los botones
+                reaccionButtons.forEach(button => {
+                    const reaction = button.getAttribute('data-reaction');
+                    button.classList.remove('active');
+                });
             }
         });
+    </script>
 
+    <!-- Manejo de Reacciones Vinculadas a Usuarios -->
+    <script>
+        const reaccionButtons = document.querySelectorAll('.reaccion-button');
+        const reaccionesUsuariosContainer = document.getElementById('reacciones-usuarios');
 
-        <!-- Manejo de Reacciones -->
-
+        // Objeto para rastrear las reacciones del usuario
         let userReactions = {
             caballo: false,
             libertad: false,
@@ -369,62 +383,193 @@
             fitness: false
         };
 
-        function handleReaction(type) {
-            const countElement = document.getElementById(type + '-count');
-            let currentCount = parseInt(countElement.innerText);
-
-            if (userReactions[type]) {
-                currentCount -= 1;
-                userReactions[type] = false;
-            } else {
-                currentCount += 1;
-                userReactions[type] = true;
+        // Función para cargar las reacciones del usuario
+        async function cargarUserReactions() {
+            if (!auth.currentUser) {
+                // Usuario no autenticado, no cargar reacciones
+                return;
             }
 
-            countElement.innerText = currentCount;
-            sendReactionToServer(type, currentCount, userReactions[type] ? 'add' : 'remove');
-        }
+            try {
+                const userId = auth.currentUser.uid;
+                const startAt = `${userId}_`;
+                const endAt = `${userId}_\uf8ff`;
 
-        function sendReactionToServer(type, count, action) {
-            fetch('/.netlify/functions/manejarReaccion', { // Asegúrate de que esta función existe y está correctamente configurada
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    reaction: type,
-                    action: action
-                }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Reacción procesada con éxito:', data);
-                })
-                .catch((error) => {
-                    console.error('Error al procesar la reacción:', error);
-                    alert('Hubo un error al procesar tu reacción. Por favor, intenta de nuevo.');
+                const userReactionsSnapshot = await db.collection('reaccionesUsuarios')
+                    .where(firebase.firestore.FieldPath.documentId(), '>=', startAt)
+                    .where(firebase.firestore.FieldPath.documentId(), '<=', endAt)
+                    .get();
+
+                // Resetear las reacciones del usuario
+                userReactions = {
+                    caballo: false,
+                    libertad: false,
+                    filosofico: false,
+                    fitness: false
+                };
+
+                userReactionsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.reacted) {
+                        userReactions[data.reaction] = true;
+                    }
                 });
-        }
-    </script>
 
-    <!-- Escuchar cambios en las Reacciones en Firestore -->
-    <script>
-        // Referencia al documento de reacciones
-        var reactionsRef = db.collection('reacciones').doc('current_reactions');
+                // Actualizar el estado de los botones
+                reaccionButtons.forEach(button => {
+                    const reaction = button.getAttribute('data-reaction');
+                    if (userReactions[reaction]) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
 
-        // Escuchar cambios en tiempo real
-        reactionsRef.onSnapshot((doc) => {
-            if (doc.exists) {
-                var data = doc.data();
-                document.getElementById('caballo-count').innerText = data.caballo;
-                document.getElementById('libertad-count').innerText = data.libertad;
-                document.getElementById('filosofico-count').innerText = data.filosofico;
-                document.getElementById('fitness-count').innerText = data.fitness;
-            } else {
-                console.log("No se encontró el documento de reacciones.");
+            } catch (error) {
+                console.error('Error al cargar reacciones del usuario:', error);
             }
-        }, (error) => {
-            console.log("Error al obtener el documento de reacciones:", error);
+        }
+
+        // Función para cargar y mostrar las últimas 2 reacciones de usuarios
+        async function cargarReaccionesUsuarios() {
+            if (!reaccionesUsuariosContainer) {
+                console.error('El contenedor de reacciones de usuarios no existe.');
+                return;
+            }
+
+            try {
+                // Obtener los últimos 2 documentos de reaccionesUsuarios ordenados por timestamp descendente
+                const snapshot = await db.collection('reaccionesUsuarios')
+                    .orderBy('timestamp', 'desc')
+                    .limit(2)
+                    .get();
+
+                reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
+
+                if (snapshot.empty) {
+                    reaccionesUsuariosContainer.innerHTML = '<p>No hay reacciones de usuarios.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const reaccionUsuario = doc.data();
+                        const reaccionElement = document.createElement('p');
+                        reaccionElement.innerHTML = `
+                            <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+                            <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
+                        `;
+                        reaccionesUsuariosContainer.appendChild(reaccionElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar reacciones de usuarios:', error);
+                reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
+            }
+        }
+
+        // Manejo de Reacciones
+        reaccionButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const reaction = button.getAttribute('data-reaction');
+                const action = button.classList.contains('active') ? 'remove' : 'add';
+
+                // Obtener el usuario actual
+                const user = auth.currentUser;
+                if (!user) {
+                    alert('Debes iniciar sesión para reaccionar.');
+                    return;
+                }
+
+                // Prevenir múltiples reacciones del mismo tipo
+                if (action === 'add' && userReactions[reaction]) {
+                    alert('Ya has reaccionado con esta reacción.');
+                    return;
+                }
+
+                try {
+                    const token = await user.getIdToken();
+
+                    const response = await fetch('/.netlify/functions/manejarReaccion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ reaction, action })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Actualizar los conteos de reacciones
+                        document.getElementById(`${reaction}-count`).innerText = data.reactions[reaction];
+                        cargarReaccionesUsuarios();
+
+                        // Actualizar el estado de las reacciones del usuario
+                        if (action === 'add') {
+                            userReactions[reaction] = true;
+                            button.classList.add('active');
+                        } else if (action === 'remove') {
+                            userReactions[reaction] = false;
+                            button.classList.remove('active');
+                        }
+                    } else {
+                        alert(`Error: ${data.message}`);
+                        // Revertir el estado visual del botón si hubo un error
+                        button.classList.toggle('active');
+                    }
+                } catch (error) {
+                    console.error('Error al enviar reacción:', error);
+                    alert('Hubo un error al enviar tu reacción. Inténtalo de nuevo.');
+                    // Revertir el estado visual del botón si hubo un error
+                    button.classList.toggle('active');
+                }
+            });
+        });
+
+        // Función para cargar y mostrar quién ha reaccionado
+        async function cargarReaccionesUsuarios() {
+            if (!reaccionesUsuariosContainer) {
+                console.error('El contenedor de reacciones de usuarios no existe.');
+                return;
+            }
+
+            try {
+                // Obtener los últimos 2 documentos de reaccionesUsuarios ordenados por timestamp descendente
+                const snapshot = await db.collection('reaccionesUsuarios')
+                    .orderBy('timestamp', 'desc')
+                    .limit(2)
+                    .get();
+
+                reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
+
+                if (snapshot.empty) {
+                    reaccionesUsuariosContainer.innerHTML = '<p>No hay reacciones de usuarios.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const reaccionUsuario = doc.data();
+                        const reaccionElement = document.createElement('p');
+                        reaccionElement.innerHTML = `
+                            <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+                            <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
+                        `;
+                        reaccionesUsuariosContainer.appendChild(reaccionElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar reacciones de usuarios:', error);
+                reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
+            }
+        }
+
+        // Cargar reacciones de usuarios al cargar la página
+        window.addEventListener('load', () => {
+            cargarReaccionesUsuarios();
+
+            // Escuchar cambios en tiempo real
+            db.collection('reaccionesUsuarios').orderBy('timestamp', 'desc')
+                .limit(2)
+                .onSnapshot(snapshot => {
+                    cargarReaccionesUsuarios();
+                });
         });
     </script>
 
@@ -482,32 +627,33 @@
                 const snapshot = await db.collection('comentarios').orderBy('timestamp', 'desc').get();
                 comentariosContainer.innerHTML = ''; // Limpiar contenedor
 
-                snapshot.forEach(doc => {
-                    const comentario = doc.data();
-                    const comentarioElement = document.createElement('div');
-                    comentarioElement.classList.add('col-md-6', 'mb-4');
-                    comentarioElement.innerHTML = `
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            ${comentario.usuarioFoto ? `<img src="${comentario.usuarioFoto}" alt="${comentario.usuarioNombre}" class="rounded-circle me-2" width="40" height="40">` : ''}
-                            <h5 class="card-title mb-0">${comentario.usuarioNombre}</h5>
+                if (snapshot.empty) {
+                    comentariosContainer.innerHTML = '<p>No hay comentarios.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const comentario = doc.data();
+                        const comentarioElement = document.createElement('div');
+                        comentarioElement.classList.add('col-md-6', 'mb-4');
+                        comentarioElement.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                ${comentario.usuarioFoto ? `<img src="${comentario.usuarioFoto}" alt="${comentario.usuarioNombre}" class="rounded-circle me-2" width="40" height="40">` : ''}
+                                <h5 class="card-title mb-0">${comentario.usuarioNombre}</h5>
+                            </div>
+                            <p class="card-text">${comentario.texto}</p>
+                            <small class="text-muted">${comentario.timestamp?.toDate().toLocaleString() || ''}</small>
                         </div>
-                        <p class="card-text">${comentario.texto}</p>
-                        <small class="text-muted">${comentario.timestamp?.toDate().toLocaleString() || ''}</small>
                     </div>
-                </div>
-            `;
-                    comentariosContainer.appendChild(comentarioElement);
-                });
+                `;
+                        comentariosContainer.appendChild(comentarioElement);
+                    });
+                }
             } catch (error) {
                 console.error('Error al cargar comentarios:', error);
                 comentariosContainer.innerHTML = '<p>Error al cargar comentarios.</p>';
             }
         }
-
-        // Cargar comentarios al cargar la página
-        window.onload = cargarComentarios;
 
         // Actualizar comentarios en tiempo real
         db.collection('comentarios').orderBy('timestamp', 'desc')
@@ -516,95 +662,28 @@
             });
     </script>
 
-    <!-- Manejo de Reacciones Vinculadas a Usuarios -->
+    <!-- Escuchar cambios en las Reacciones en Firestore -->
     <script>
-        const reaccionButtons = document.querySelectorAll('.reaccion-button');
-        const reaccionesUsuariosContainer = document.getElementById('reacciones-usuarios');
+        // Referencia al documento de reacciones
+        var reactionsRef = db.collection('reacciones').doc('current_reactions');
 
-        reaccionButtons.forEach(button => {
-            button.addEventListener('click', async () => {
-                const reaction = button.getAttribute('data-reaction');
-                const action = button.classList.contains('active') ? 'remove' : 'add';
-
-                // Alternar la clase 'active' para visualización
-                button.classList.toggle('active');
-
-                // Obtener el usuario actual
-                const user = auth.currentUser;
-                if (!user) {
-                    alert('Debes iniciar sesión para reaccionar.');
-                    return;
-                }
-
-                try {
-                    const token = await user.getIdToken();
-
-                    const response = await fetch('/.netlify/functions/manejarReaccion', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ reaction, action })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        // Actualizar los conteos de reacciones
-                        document.getElementById(`${reaction}-count`).innerText = data.reactions[reaction];
-                        cargarReaccionesUsuarios();
-                    } else {
-                        alert(`Error: ${data.message}`);
-                    }
-                } catch (error) {
-                    console.error('Error al enviar reacción:', error);
-                    alert('Hubo un error al enviar tu reacción. Inténtalo de nuevo.');
-                }
-            });
+        // Escuchar cambios en tiempo real
+        reactionsRef.onSnapshot((doc) => {
+            if (doc.exists) {
+                var data = doc.data();
+                document.getElementById('caballo-count').innerText = data.caballo;
+                document.getElementById('libertad-count').innerText = data.libertad;
+                document.getElementById('filosofico-count').innerText = data.filosofico;
+                document.getElementById('fitness-count').innerText = data.fitness;
+            } else {
+                console.log("No se encontró el documento de reacciones.");
+            }
+        }, (error) => {
+            console.log("Error al obtener el documento de reacciones:", error);
         });
-
-        // Función para cargar y mostrar quién ha reaccionado
-        async function cargarReaccionesUsuarios() {
-            if (!reaccionesUsuariosContainer) {
-                console.error('El contenedor de reacciones de usuarios no existe.');
-                return;
-            }
-
-            try {
-                const snapshot = await db.collection('reaccionesUsuarios').get();
-                reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
-
-                if (snapshot.empty) {
-                    reaccionesUsuariosContainer.innerHTML = '<p>No hay reacciones de usuarios.</p>';
-                } else {
-                    snapshot.forEach(doc => {
-                        const reaccionUsuario = doc.data();
-                        const reaccionElement = document.createElement('p');
-                        reaccionElement.innerHTML = `
-                    <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
-                    <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
-                `;
-                        reaccionesUsuariosContainer.appendChild(reaccionElement);
-                    });
-                }
-            } catch (error) {
-                console.error('Error al cargar reacciones de usuarios:', error);
-                reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
-            }
-        }
-
-        // Cargar reacciones de usuarios al cargar la página
-        window.onload = () => {
-            cargarReaccionesUsuarios();
-
-            // Escuchar cambios en tiempo real
-            db.collection('reaccionesUsuarios').onSnapshot(snapshot => {
-                cargarReaccionesUsuarios();
-            });
-        };
     </script>
 
+    <!-- Bootstrap JS y dependencias -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
 </body>

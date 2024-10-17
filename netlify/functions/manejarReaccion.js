@@ -1,3 +1,5 @@
+// manejarReaccion.js
+
 const admin = require('firebase-admin');
 
 // Inicializar Firebase Admin usando variables de entorno
@@ -34,8 +36,8 @@ exports.handler = async function (event, context) {
         // Verificar el token
         const decodedToken = await admin.auth().verifyIdToken(token);
         const usuarioId = decodedToken.uid;
-        const usuarioNombre = decodedToken.name;
-        const usuarioFoto = decodedToken.picture;
+        const usuarioNombre = decodedToken.name || decodedToken.email; // Asegurar que haya un nombre
+        const usuarioFoto = decodedToken.picture || '';
 
         const { reaction, action } = JSON.parse(event.body);
 
@@ -62,26 +64,56 @@ exports.handler = async function (event, context) {
             reactions = doc.data();
         }
 
-        // Actualizar el conteo de la reacción según la acción
-        if (reactions.hasOwnProperty(reaction)) {
-            if (action === 'add') {
-                reactions[reaction]++;
-            } else if (action === 'remove') {
-                reactions[reaction]--;
-            }
-            // Guardar los cambios en Firestore
-            await reactionsRef.set(reactions);
-        }
+        // Crear un ID único para la reacción del usuario
+        const reaccionUsuarioId = `${usuarioId}_${reaction}`;
+        const reaccionUsuarioRef = db.collection('reaccionesUsuarios').doc(reaccionUsuarioId);
+        const reaccionUsuarioDoc = await reaccionUsuarioRef.get();
 
-        // Registrar quién reaccionó
-        const reaccionUsuarioRef = db.collection('reaccionesUsuarios').doc(usuarioId);
-        await reaccionUsuarioRef.set({
-            usuarioNombre,
-            usuarioFoto,
-            reaction,
-            action,
-            timestamp: admin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        if (action === 'add') {
+            if (reaccionUsuarioDoc.exists && reaccionUsuarioDoc.data().reacted) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ message: 'Ya has reaccionado con esta reacción.' }),
+                };
+            }
+
+            // Incrementar el contador de la reacción
+            if (reactions.hasOwnProperty(reaction)) {
+                reactions[reaction]++;
+                await reactionsRef.set(reactions);
+            }
+
+            // Registrar la reacción del usuario
+            await reaccionUsuarioRef.set({
+                usuarioNombre,
+                usuarioFoto,
+                reaction,
+                reacted: true,
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+
+        } else if (action === 'remove') {
+            if (!reaccionUsuarioDoc.exists || !reaccionUsuarioDoc.data().reacted) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ message: 'No has reaccionado con esta reacción.' }),
+                };
+            }
+
+            // Decrementar el contador de la reacción
+            if (reactions.hasOwnProperty(reaction)) {
+                reactions[reaction] = Math.max(reactions[reaction] - 1, 0);
+                await reactionsRef.set(reactions);
+            }
+
+            // Eliminar la reacción del usuario
+            await reaccionUsuarioRef.delete();
+        } else {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: 'Acción no válida.' }),
+            };
+        }
 
         // Responder con éxito y el estado actualizado de las reacciones
         return {
