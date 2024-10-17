@@ -59,18 +59,24 @@ export function setupComments(auth, db) {
 
             const data = await response.json();
 
-            if (response.ok) {
-                // Remover el comentario temporal
-                comentariosContainer.removeChild(comentarioElement);
-                // Recargar los comentarios para mostrar el nuevo comentario
-                cargarComentarios();
-                comentarioTexto.value = '';
-            } else {
+            // Verificar si la respuesta es correcta
+            if (!response.ok) {
                 throw new Error(data.message || 'Error desconocido');
             }
+
+            // Remover el comentario temporal
+            comentariosContainer.removeChild(comentarioElement);
+
+            // Recargar los comentarios para mostrar el nuevo comentario
+            cargarComentarios();
+            comentarioTexto.value = ''; // Limpiar la caja de texto
+
         } catch (error) {
             console.error('Error al enviar comentario:', error);
+
+            // Mostrar alerta solo si hay un error real
             alert('Hubo un error al enviar tu comentario. Inténtalo de nuevo.');
+
             // Remover el comentario temporal
             comentariosContainer.removeChild(comentarioElement);
         }
