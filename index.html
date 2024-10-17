@@ -188,17 +188,20 @@
                 </button>
             </div>
 
-            <div class="google-signin-container mt-4">
+            <div id="auth" class="google-signin-container mt-4">
                 <button id="google-signin" class="btn btn-primary">
-                    <i class="fab fa-google"></i> Iniciar Sesión para comentar y reaccionar
+                    <i class="fab fa-google"></i> Iniciar Sesión para Comentar y Reaccionar
+                </button>
+                <button id="signout" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
 
-            <!-- Información del usuario -->
-            <div id="user-info" style="display: none;">
-                <img id="user-photo" src="" alt="Foto de Perfil" width="50" height="50" class="rounded-circle">
-                <span id="user-name"></span>
+                <!-- Información del usuario (solo visible si el usuario está autenticado) -->
+                <div id="user-info" style="display: none;">
+                    <img id="user-photo" src="" alt="Foto de Perfil" width="50" height="50" class="rounded-circle">
+                    <span id="user-name"></span>
+                </div>
             </div>
-        </div>
     </section>
 
     <!-- Caja de texto para nuevo comentario -->
@@ -321,25 +324,28 @@
         });
 
         // Escuchar cambios en el estado de autenticación
+        // Escuchar cambios en el estado de autenticación
         auth.onAuthStateChanged((user) => {
+            const googleSignInButton = document.getElementById('google-signin');
+            const signOutButton = document.getElementById('signout');
+            const userInfo = document.getElementById('user-info');
+            const userPhoto = document.getElementById('user-photo');
+            const userName = document.getElementById('user-name');
+
             if (user) {
-                // Mostrar botón de cerrar sesión y ocultar botón de inicio
+                // Ocultar botón de inicio y mostrar botón de cerrar sesión e información del usuario
                 googleSignInButton.style.display = 'none';
                 signOutButton.style.display = 'inline-block';
-
-                // Mostrar información del usuario
                 userInfo.style.display = 'block';
+
+                // Mostrar la información del usuario
                 userPhoto.src = user.photoURL;
                 userName.textContent = `Bienvenido, ${user.displayName}`;
             } else {
-                // Mostrar botón de inicio y ocultar botón de cerrar sesión
+                // Mostrar botón de inicio y ocultar botón de cerrar sesión e información del usuario
                 googleSignInButton.style.display = 'inline-block';
                 signOutButton.style.display = 'none';
-
-                // Ocultar información del usuario
                 userInfo.style.display = 'none';
-                userPhoto.src = '';
-                userName.textContent = '';
             }
         });
     </script>
