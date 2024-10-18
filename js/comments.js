@@ -1,7 +1,8 @@
 // js/comments.js
 
+import { fetchWithRetry } from './utils.js';
+
 const firebase = window.firebase;
-console.log('Firebase en comments.js:', firebase); // Línea de depuración
 
 export function setupComments(auth, db) {
     const comentarioTexto = document.getElementById('comentario-texto');
@@ -23,30 +24,55 @@ export function setupComments(auth, db) {
             return;
         }
 
+        // Crear un ID temporal para el comentario optimista
+        const tempId = `temp-${Date.now()}`;
+
+        // Crear el comentario optimista en la UI
+        const comentarioElement = document.createElement('div');
+        comentarioElement.classList.add('col-md-6', 'mb-4', 'comentario-temporal');
+        comentarioElement.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="${user.photoURL}" alt="${user.displayName}" class="rounded-circle me-2" width="40" height="40">
+                        <h5 class="card-title mb-0">${user.displayName} (Enviando...)</h5>
+                    </div>
+                    <p class="card-text">${sanitizeHTML(texto)}</p>
+                    <small class="text-muted">Enviando...</small>
+                </div>
+            </div>
+        `;
+        comentariosContainer.prepend(comentarioElement); // Añadir al inicio
+
         try {
             const token = await user.getIdToken();
 
-            const response = await fetch('/.netlify/functions/crearComentario', {
+            // Enviar solicitud POST con fetchWithRetry
+            const response = await fetchWithRetry('/.netlify/functions/crearComentario', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ texto })
-            });
+            }, 3, 500); // 3 reintentos, 500ms inicial
 
             const data = await response.json();
 
             if (response.ok) {
-                alert('Comentario enviado exitosamente.');
+                // Remover el comentario temporal
+                comentariosContainer.removeChild(comentarioElement);
+                // Recargar los comentarios para mostrar el nuevo comentario
+                cargarComentarios();
                 comentarioTexto.value = '';
-                cargarComentarios(); // Función para recargar los comentarios
             } else {
-                alert(`Error: ${data.message}`);
+                throw new Error(data.message || 'Error desconocido');
             }
         } catch (error) {
             console.error('Error al enviar comentario:', error);
             alert('Hubo un error al enviar tu comentario. Inténtalo de nuevo.');
+            // Remover el comentario temporal
+            comentariosContainer.removeChild(comentarioElement);
         }
     });
 
@@ -84,7 +110,7 @@ export function setupComments(auth, db) {
         }
     }
 
-    // Sanitización para prevenir XSS
+    // Función de sanitización para prevenir XSS
     function sanitizeHTML(str) {
         const temp = document.createElement('div');
         temp.textContent = str;
