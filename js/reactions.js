@@ -1,5 +1,3 @@
-// js/reactions.js
-
 import { fetchWithRetry } from './utils.js';
 
 const firebase = window.firebase;
@@ -17,7 +15,7 @@ export function setupReactions(auth, db) {
     };
 
     // Función para cargar las reacciones del usuario
-    window.loadUserReactions = async function() {
+    window.loadUserReactions = async function () {
         if (!auth.currentUser) return;
 
         try {
@@ -61,7 +59,7 @@ export function setupReactions(auth, db) {
     };
 
     // Función para resetear las reacciones del usuario
-    window.resetUserReactions = function() {
+    window.resetUserReactions = function () {
         window.userReactions = {
             caballo: false,
             libertad: false,
@@ -107,6 +105,28 @@ export function setupReactions(auth, db) {
         } catch (error) {
             console.error('Error al cargar reacciones de usuarios:', error);
             reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
+        }
+    }
+
+    // Función para cargar las reacciones iniciales desde Firestore
+    async function cargarReaccionesIniciales() {
+        try {
+            // Referencia al documento que contiene las reacciones
+            const reactionsDoc = await db.collection('reacciones').doc('current_reactions').get();
+
+            if (reactionsDoc.exists) {
+                const reactions = reactionsDoc.data();
+
+                // Actualizar la UI con los valores de las reacciones desde Firestore
+                document.getElementById('caballo-count').innerText = reactions.caballo || 0;
+                document.getElementById('libertad-count').innerText = reactions.libertad || 0;
+                document.getElementById('filosofico-count').innerText = reactions.filosofico || 0;
+                document.getElementById('fitness-count').innerText = reactions.fitness || 0;
+            } else {
+                console.error("No se encontraron reacciones en Firestore.");
+            }
+        } catch (error) {
+            console.error("Error al cargar las reacciones iniciales:", error);
         }
     }
 
@@ -173,6 +193,9 @@ export function setupReactions(auth, db) {
             }
         });
     });
+
+    // Cargar las reacciones iniciales al iniciar la página
+    cargarReaccionesIniciales();
 
     // Cargar y mostrar las últimas 2 reacciones de usuarios
     cargarReaccionesUsuarios();
