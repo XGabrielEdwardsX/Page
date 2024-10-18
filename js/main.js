@@ -2,7 +2,7 @@
 
 import { initializeAuth, setupAuthUI } from './auth.js';
 import { setupReactions } from './reactions.js';
-import { setupComments } from './comments.js';
+import { setupComments } from './comments.js'; 
 
 const firebaseConfig = {
     apiKey: "AIzaSyCI6qEjysMXJ5SLjvDk3KtVLORIZ1V8FAA",
@@ -21,6 +21,3 @@ setupAuthUI(auth, db);
 // Configurar manejo de reacciones y comentarios
 setupReactions(auth, db);
 setupComments(auth, db);
-
-// Configurar la sección de YouTube
-setupYouTube();
