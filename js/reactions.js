@@ -85,8 +85,6 @@ export function setupReactions(auth, db) {
         }
 
         try {
-            const user = auth.currentUser;
-
             // Obtener los últimos 5 documentos de reaccionesUsuarios ordenados por timestamp descendente
             const snapshot = await db.collection('reaccionesUsuarios')
                 .orderBy('timestamp', 'desc')
@@ -105,8 +103,8 @@ export function setupReactions(auth, db) {
                 snapshot.forEach(doc => {
                     const reaccionUsuario = doc.data();
 
-                    // Excluir la reacción del usuario actual
-                    if (reaccionUsuario.usuarioId === user.uid) {
+                    // Excluir la reacción del usuario actual si está autenticado
+                    if (auth.currentUser && reaccionUsuario.usuarioId === auth.currentUser.uid) {
                         return; // Saltar esta reacción
                     }
 
@@ -139,10 +137,9 @@ export function setupReactions(auth, db) {
     // Función para crear un elemento de reacción de usuario
     function crearElementoReaccionUsuario(reaccionUsuario) {
         const reaccionElement = document.createElement('p');
-        reaccionElement.innerHTML = `
-            <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
-            <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
-        `;
+        reaccionElement.innerHTML = 
+            `<img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+            <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>`;
         // La animación de entrada se aplica automáticamente mediante CSS
         return reaccionElement;
     }
