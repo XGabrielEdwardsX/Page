@@ -75,16 +75,14 @@ export function setupComments(auth, db) {
         }
     });
 
-    async function cargarComentarios(query = commentsQuery, isInitialLoad = false) {
+    async function cargarComentarios(query = commentsQuery, isInitialLoad = false, shouldScroll = false) {
         try {
-            // Iniciar la transición de desvanecimiento
             comentariosContainer.style.opacity = '0';
 
             const snapshot = await query.get();
 
-            // Después de obtener los datos, esperar a que termine la transición
             setTimeout(async () => {
-                comentariosContainer.innerHTML = ''; // Limpiar el contenedor
+                comentariosContainer.innerHTML = '';
 
                 if (!snapshot.empty) {
                     snapshot.forEach(doc => {
@@ -92,11 +90,9 @@ export function setupComments(auth, db) {
                         agregarComentarioAlDOM(comentario);
                     });
 
-                    // Actualizar firstVisible y lastVisible
                     firstVisible = snapshot.docs[0];
                     lastVisible = snapshot.docs[snapshot.docs.length - 1];
 
-                    // Determinar si hay más comentarios después del último visible
                     const nextQuery = db.collection('comentarios')
                         .orderBy('timestamp', 'asc')
                         .startAfter(lastVisible)
@@ -105,13 +101,10 @@ export function setupComments(auth, db) {
                     const nextSnapshot = await nextQuery.get();
                     nextPageBtn.style.display = nextSnapshot.empty ? 'none' : 'block';
 
-                    // Mostrar/Ocultar el botón "Anterior"
                     prevPageBtn.style.display = (currentPage === 1) ? 'none' : 'block';
 
-                    // Mostrar el número de página actual
                     pageNumberElement.textContent = `Página ${currentPage}`;
                 } else {
-                    // Si no hay comentarios, limpiar referencias y ocultar botones
                     firstVisible = null;
                     lastVisible = null;
                     nextPageBtn.style.display = 'none';
@@ -119,18 +112,60 @@ export function setupComments(auth, db) {
                     pageNumberElement.textContent = 'Página 1';
                 }
 
-                // Restaurar la opacidad para mostrar los nuevos comentarios con animación
                 comentariosContainer.style.opacity = '1';
 
-                // Opcional: Desplazarse suavemente al inicio del contenedor de comentarios
-                comentariosContainer.scrollIntoView({ behavior: 'smooth' });
+                // Solo hacemos scroll si shouldScroll es true
+                if (shouldScroll) {
+                    comentariosContainer.scrollIntoView({ behavior: 'smooth' });
+                }
 
-            }, 300); // El retraso debe coincidir con la duración de la transición
+            }, 300);
         } catch (error) {
             console.error('Error al cargar comentarios:', error);
             comentariosContainer.innerHTML = '<p>Error al cargar comentarios.</p>';
         }
     }
+
+    // Cargar los comentarios iniciales sin hacer scroll
+    cargarComentarios(commentsQuery, true, false);
+
+    // Al hacer clic en "Siguiente" o "Anterior", hacemos scroll
+    nextPageBtn.addEventListener('click', () => {
+        if (lastVisible) {
+            const nextQuery = db.collection('comentarios')
+                .orderBy('timestamp', 'asc')
+                .startAfter(lastVisible)
+                .limit(pageSize);
+
+            nextQuery.get().then((snapshot) => {
+                if (!snapshot.empty) {
+                    currentPage++;
+                    cargarComentarios(nextQuery, false, true); // Hacemos scroll al cargar la siguiente página
+                } else {
+                    nextPageBtn.style.display = 'none';
+                }
+            });
+        }
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+        if (firstVisible) {
+            const prevQuery = db.collection('comentarios')
+                .orderBy('timestamp', 'asc')
+                .endBefore(firstVisible)
+                .limitToLast(pageSize);
+
+            prevQuery.get().then((snapshot) => {
+                if (!snapshot.empty) {
+                    currentPage--;
+                    cargarComentarios(prevQuery, false, true); // Hacemos scroll al cargar la página anterior
+                } else {
+                    prevPageBtn.style.display = 'none';
+                }
+            });
+        }
+    });
+
 
     // Función para agregar un comentario al DOM
     function agregarComentarioAlDOM(comentario) {
