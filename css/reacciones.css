@@ -2,7 +2,7 @@
 .reacciones-section  {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.5rem;
-    color: #000000; /* Cambiar a blanco para el texto */
+    color: #000000; /* Texto en negro */
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease;
     padding: 10px 20px;
@@ -11,16 +11,14 @@
 .reaccion-button {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.5rem;
-    color: #ffffff; /* Cambiar a blanco para el texto */
+    color: #ffffff; /* Texto en blanco */
     border-radius: 5px;
     transition: background-color 0.3s ease, color 0.3s ease;
-
 }
 
-
 .reacciones-section .reaccion-button.active {
-    background-color: #FFD700; /* Color dorado para cuando se selecciona */
-    color: #ffffff; /* Texto en negro cuando se selecciona */
+    background-color: #FFD700; /* Color dorado cuando está activo */
+    color: #ffffff; /* Texto en blanco */
     transform: scale(1.1); /* Efecto de aumento al estar activo */
 }
 
@@ -38,6 +36,7 @@
 #reacciones-usuarios p {
     color: #FFD700;
     font-size: 1.2rem;
+    animation: fadeInUp 0.5s forwards; /* Animación de entrada */
 }
 
 #reacciones-usuarios img {
@@ -49,4 +48,32 @@
 #filosofico-count,
 #fitness-count {
     transition: color 0.3s;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+/* Clase para la animación de salida */
+.fade-out {
+    animation: fadeOutDown 0.5s forwards;
 }
