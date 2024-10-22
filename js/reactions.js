@@ -1,3 +1,5 @@
+// js/reactions.js
+
 import { fetchWithRetry } from './utils.js';
 
 const firebase = window.firebase;
@@ -13,6 +15,9 @@ export function setupReactions(auth, db) {
         filosofico: false,
         fitness: false
     };
+
+    // Variable para almacenar el estado previo de las reacciones de usuarios
+    let previousReaccionesUsuariosHTML = '';
 
     // Función para cargar las reacciones del usuario
     window.loadUserReactions = async function () {
@@ -68,12 +73,11 @@ export function setupReactions(auth, db) {
         };
 
         reaccionButtons.forEach(button => {
-            const reaction = button.getAttribute('data-reaction');
             button.classList.remove('active');
         });
     };
 
-    // Función para cargar y mostrar las últimas 2 reacciones de usuarios
+    // Función para cargar y mostrar las últimas reacciones de usuarios
     async function cargarReaccionesUsuarios() {
         if (!reaccionesUsuariosContainer) {
             console.error('El contenedor de reacciones de usuarios no existe.');
@@ -81,31 +85,66 @@ export function setupReactions(auth, db) {
         }
 
         try {
-            // Obtener los últimos 2 documentos de reaccionesUsuarios ordenados por timestamp descendente
+            const user = auth.currentUser;
+
+            // Obtener los últimos 5 documentos de reaccionesUsuarios ordenados por timestamp descendente
             const snapshot = await db.collection('reaccionesUsuarios')
                 .orderBy('timestamp', 'desc')
-                .limit(2)
+                .limit(5)
                 .get();
 
-            reaccionesUsuariosContainer.innerHTML = ''; // Limpiar contenedor
+            // Crear un DocumentFragment para agregar los nuevos elementos
+            const fragment = document.createDocumentFragment();
 
             if (snapshot.empty) {
-                reaccionesUsuariosContainer.innerHTML = '<p>No hay reacciones de usuarios.</p>';
+                const mensaje = document.createElement('p');
+                mensaje.textContent = 'No hay reacciones de usuarios.';
+                fragment.appendChild(mensaje);
             } else {
+                let reactionsAdded = 0;
                 snapshot.forEach(doc => {
                     const reaccionUsuario = doc.data();
-                    const reaccionElement = document.createElement('p');
-                    reaccionElement.innerHTML = `
-                        <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
-                        <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
-                    `;
-                    reaccionesUsuariosContainer.appendChild(reaccionElement);
+
+                    // Excluir la reacción del usuario actual
+                    if (reaccionUsuario.usuarioId === user.uid) {
+                        return; // Saltar esta reacción
+                    }
+
+                    // Agregar la reacción al fragmento
+                    if (reactionsAdded < 2) {
+                        const reaccionElement = crearElementoReaccionUsuario(reaccionUsuario);
+                        fragment.appendChild(reaccionElement);
+                        reactionsAdded++;
+                    }
                 });
+
+                // Si no se llenan las 2 reacciones, mostrar menos
+                if (reactionsAdded === 0) {
+                    const mensaje = document.createElement('p');
+                    mensaje.textContent = 'No hay más reacciones de usuarios.';
+                    fragment.appendChild(mensaje);
+                }
             }
+
+            // Reemplazar el contenido del contenedor
+            reaccionesUsuariosContainer.innerHTML = '';
+            reaccionesUsuariosContainer.appendChild(fragment);
+
         } catch (error) {
             console.error('Error al cargar reacciones de usuarios:', error);
             reaccionesUsuariosContainer.innerHTML = '<p>Error al cargar reacciones de usuarios.</p>';
         }
+    }
+
+    // Función para crear un elemento de reacción de usuario
+    function crearElementoReaccionUsuario(reaccionUsuario) {
+        const reaccionElement = document.createElement('p');
+        reaccionElement.innerHTML = `
+            <img src="${reaccionUsuario.usuarioFoto}" alt="${reaccionUsuario.usuarioNombre}" width="30" height="30" class="rounded-circle me-2">
+            <strong>${reaccionUsuario.usuarioNombre}</strong> reaccionó con <em>${reaccionUsuario.reaction}</em>
+        `;
+        // La animación de entrada se aplica automáticamente mediante CSS
+        return reaccionElement;
     }
 
     // Función para cargar las reacciones iniciales desde Firestore
@@ -130,7 +169,7 @@ export function setupReactions(auth, db) {
         }
     }
 
-    // Manejo de Reacciones con Optimistic UI
+    // Manejo de Reacciones con Actualización Optimista y Ajustes
     reaccionButtons.forEach(button => {
         button.addEventListener('click', async () => {
             const reaction = button.getAttribute('data-reaction');
@@ -160,6 +199,32 @@ export function setupReactions(auth, db) {
             button.classList.toggle('active');
             window.userReactions[reaction] = action === 'add';
 
+            // Guardar el estado previo de las reacciones de usuarios
+            previousReaccionesUsuariosHTML = reaccionesUsuariosContainer.innerHTML;
+
+            if (action === 'add') {
+                // ... código existente para agregar la reacción optimistamente ...
+            } else {
+                // Optimistic UI Update: Eliminar la reacción del usuario inmediatamente
+
+                // Encontrar y eliminar el elemento de reacción del usuario
+                const userReactionElements = Array.from(reaccionesUsuariosContainer.children);
+                userReactionElements.forEach(element => {
+                    const userName = element.querySelector('strong')?.textContent;
+                    if (userName === user.displayName) {
+                        element.classList.add('fade-out');
+                        setTimeout(() => {
+                            reaccionesUsuariosContainer.removeChild(element);
+                        }, 500); // Duración de la animación de salida
+                    }
+                });
+
+                // Después de eliminar, cargar más reacciones para llenar los espacios vacíos
+                setTimeout(() => {
+                    cargarReaccionesUsuarios();
+                }, 500); // Esperamos a que termine la animación de salida
+            }
+
             try {
                 const token = await user.getIdToken();
 
@@ -178,7 +243,7 @@ export function setupReactions(auth, db) {
                 if (response.ok) {
                     // Actualizar los conteos de reacciones desde la respuesta del servidor
                     countElement.innerText = data.reactions[reaction];
-                    cargarReaccionesUsuarios();
+                    // La interfaz se sincronizará automáticamente gracias al listener en tiempo real
                 } else {
                     throw new Error(data.message || 'Error desconocido');
                 }
@@ -190,6 +255,9 @@ export function setupReactions(auth, db) {
                 countElement.innerText = previousCount;
                 button.classList.toggle('active');
                 window.userReactions[reaction] = isActive;
+
+                // Revertir el estado previo de las reacciones de usuarios
+                reaccionesUsuariosContainer.innerHTML = previousReaccionesUsuariosHTML;
             }
         });
     });

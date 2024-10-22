@@ -302,6 +302,12 @@ textarea.comment-box {
     font-size: 1.2rem;
     margin: 10px auto;
     resize: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+textarea.comment-box:focus {
+    border-color: #e6b800;
+    box-shadow: 0 0 10px rgba(230, 184, 0, 0.5);
 }
 
 /* Botón de enviar comentario */
@@ -317,12 +323,13 @@ textarea.comment-box {
     cursor: pointer;
     margin: 10px auto;
     width: fit-content;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
 .comment-btn:hover {
     background-color: #e6b800;
     color: #fff;
+    transform: scale(1.05);
 }
 
 /* Estilo para los comentarios */
@@ -333,21 +340,27 @@ textarea.comment-box {
     border: 1px solid #FFD700;
     border-radius: 10px;
     color: #f0f0f0;
+    flex: 1 1 calc(50% - 20px); 
+    max-width: calc(50% - 20px);
+    margin-bottom: 20px; 
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.5s forwards;
 }
 
-.comment-author {
-    font-size: 1.5rem;
-    color: #FFD700;
-}
-
-.comment-text {
-    font-size: 1.2rem;
+/* Animación de fade-in para los comentarios */
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Links dentro de los comentarios */
 .comment a {
     color: #FFD700;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 .comment a:hover {
@@ -355,31 +368,47 @@ textarea.comment-box {
     color: #e6b800;
 }
 
+/* Botones de paginación */
+.pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding: 0 10px;
+    height: 100px;
+}
+
+.pagination-controls button {
+    background-color: #FFD700;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    
+}
+
+.pagination-controls button:hover {
+    background-color: #e6b800;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* Transición para el contenedor de comentarios */
+#comentarios-container {
+    transition: opacity 0.5s;
+}
+
 /* Responsivo para la caja de comentarios */
 @media (max-width: 767px) {
-    .comment-section {
-        padding: 10px;
+    .comment {
+        flex: 1 1 100%;
+        max-width: 100%;
     }
 
-    .reaction-btn {
-        font-size: 1rem;
-    }
-
-    textarea.comment-box {
-        font-size: 1rem;
-        padding: 10px;
-    }
-
-    .comment-btn {
-        font-size: 1rem;
-        padding: 8px 15px;
-    }
-
-    .comment-author {
-        font-size: 1.2rem;
-    }
-
-    .comment-text {
-        font-size: 1rem;
-    }
+    /* Otros ajustes responsivos si es necesario */
 }
+

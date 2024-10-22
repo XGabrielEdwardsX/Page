@@ -8,16 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gabriel Edwards</title>
 
+    <!-- Meta Etiquetas para SEO -->
+    <meta name="description" content="Únete a Gabriel Edwards para explorar filosofía, desarrollo personal y fitness. Descubre como dejar de ser un idiota cuando sea necesario.">
+    <meta name="keywords" content="Gabriel Edwards, filosofía, fitness, desarrollo personal, ejercicio, bienestar, motivación, filosofía de vida">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="48x48" href="imagenes/favicon-48x48.png">
-
     <!-- Icono para Android -->
     <link rel="icon" type="image/png" sizes="192x192" href="imagenes/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="imagenes/android-chrome-512x512.png">
-
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="imagenes/apple-touch-icon.png">
-
     <!-- Favicon de diferentes tamaños -->
     <link rel="icon" type="image/png" sizes="16x16" href="imagenes/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imagenes/favicon-32x32.png">
@@ -69,7 +70,7 @@
                         <a class="nav-link" href="apoyame.html">Apóyame</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="recursos.html">Recursos</a>
+                        <a class="nav-link" href="recursos.html">Libros</a>
                     </li>
                 </ul>
             </div>
@@ -203,7 +204,9 @@
 
 
             <!-- Caja de texto para nuevo comentario -->
-            <textarea id="comentario-texto" class="comment-box" placeholder="Escribe tu comentario..."></textarea>
+            <textarea id="comentario-texto" class="comment-box" placeholder="Escribe tu comentario..."
+                maxlength="200"></textarea>
+            <p id="char-count">Te quedan 200 caracteres.</p>
 
             <!-- Botón de enviar comentario -->
             <button id="enviar-comentario" class="comment-btn">Comentar</button>
@@ -214,8 +217,17 @@
                     <div id="comentarios-container" class="row">
                         <!-- Los comentarios se insertarán aquí dinámicamente -->
                     </div>
-                </div>  
+                </div>
             </section>
+
+            <div id="page-number">Página 1</div>
+
+            <!-- Botones de paginación -->
+            <div class="pagination-controls">
+                <button id="prev-page" class="btn btn-secondary">Anterior</button>
+                <button id="next-page" class="btn btn-primary">Siguiente</button>
+            </div>
+
 
             <!-- Contacto -->
             <section id="contact" class="contact-section py-5 bg-dark text-light">
